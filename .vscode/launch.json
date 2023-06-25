@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-CosmosSqlApplication<cosmos-sql>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.thesarnas.cosmossql.CosmosSqlApplication",
+            "projectName": "cosmos-sql",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
