@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -33,6 +34,7 @@ public class CosmosSqlApplication implements CommandLineRunner {
 
     @Autowired
     private UserRepository repository;
+	private CredentialsRepository repositoryCreds;
 
     public static void main(String[] args) {
         SpringApplication.run(CosmosSqlApplication.class, args);
@@ -48,6 +50,7 @@ public class CosmosSqlApplication implements CommandLineRunner {
         final Mono<User> saveUserMono = repository.save(testUser);
 
         final Flux<User> firstNameUserFlux = repository.findByFirstName("testFirstName");
+
 
         //  Nothing happens until we subscribe to these Monos.
         //  findById won't return the user as user isn't present.
@@ -77,6 +80,8 @@ public class CosmosSqlApplication implements CommandLineRunner {
 @AllArgsConstructor
 class DataLoader {
 	private final UserRepository repo;
+	private final CredentialsRepository credRepo;
+	
 	//private static final Logger LOGGER = LoggerFactory.getLogger(DataLoader.class);
 	@PostConstruct
 	void loadData() {
@@ -87,7 +92,15 @@ class DataLoader {
 				.flatMap(repo::save)
 				.thenMany(repo.findAll())
 				.subscribe(user -> log.info(user.toString()));
+
+    	credRepo.deleteAll()
+				.thenMany(Flux.just(new Credentials("1","joshwilliams", "Password1")))
+				.flatMap(credRepo::save)
+				.thenMany(credRepo.findAll())
+				.subscribe(credentials -> log.info(credentials.toString()));								
 	}
+
+
 }
 
 /*
@@ -103,10 +116,33 @@ It is also do it as a mono (if specified) - just one.
 @AllArgsConstructor
 class CosmosSqlController{
 	private final UserRepository repo;
+	private final CredentialsRepository credRepo;
 
-	@GetMapping
+	@GetMapping("/users")
 	Flux<User> getAllUsers(){
 		return repo.findAll();
+	}
+
+	@GetMapping("/credentials")
+	Flux<Credentials> getAllCredentials(){
+		return credRepo.findAll();
+	}
+
+	@GetMapping("/credentials/{uname}")
+	Flux<Credentials> getCredentials(@PathVariable("uname") String username){
+       return credRepo.findByUsername(username);
+	}
+
+
+	@GetMapping("/credentialsExist/{uname}")
+	boolean credentialsExists(@PathVariable("uname") String username){
+       if (credRepo.findByUsername(username).equals(""))
+	   {
+			return false;
+		}else
+		{
+			return true;
+		}
 	}
 
 	@PostMapping("/add")
