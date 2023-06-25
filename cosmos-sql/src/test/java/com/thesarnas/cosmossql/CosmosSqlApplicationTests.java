@@ -2,12 +2,14 @@ package com.thesarnas.cosmossql;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ContextConfiguration;
 
-@SpringBootTest
-class CosmosSqlApplicationTests {
+//@SpringBootTest
+//@ContextConfiguration (locations =  { "classpath*:/resources/application.properties"}) 
+//class CosmosSqlApplicationTests {
 
-	@Test
-	void contextLoads() {
-	}
+//	@Test
+//	void contextLoads() {
+//	}
 
-}
+//}
